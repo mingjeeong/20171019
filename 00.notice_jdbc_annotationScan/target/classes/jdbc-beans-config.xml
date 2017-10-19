@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+<!-- factoryDao 정의 싱글톤 -->
+<bean id="FactoryDao" class="notice.model.dao.FactoryDao" factory-method="getInstance" >
+		<constructor-arg>
+			<set>
+			<value>oracle.jdbc.driver.OracleDriver</value>
+			<value>jdbc:oracle:thin:@localhost:1521:XE</value>
+			<value>hr</value>
+			<value>tiger</value>
+			<!--  
+			<ref bean="oracle.jdbc.driver.OracleDriver" />
+			<ref bean="jdbc:oracle:thin:@localhost:1521:XE" />
+			<ref bean="hr" />
+			<ref bean="tiger" />
+				<entry key="driver" value="oracle.jdbc.driver.OracleDriver" />
+				<entry key="url">
+					<value>jdbc:oracle:thin:@localhost:1521:XE</value>
+				</entry>
+				<entry key="username">
+					<value>hr</value>
+				</entry>
+				<entry key="password">
+					<value>tiger</value>
+				</entry>
+				-->
+			</set>
+		</constructor-arg>
+</bean>
+
+<bean id="loginDao" class="notice.model.dao.LoginDao" factory-method="getInstance" >
+	<property name="factory" ref="FactoryDao"></property>
+</bean>
+
+<bean id="noticeDao" class="notice.model.dao.NoticeDao" factory-method="getInstance">
+	<property name="factory" ref="FactoryDao"></property>
+</bean>
+<!-- java 코드로 바꾸면
+	NoticeDao noticeDao = NoticeDao.getInstance(factory);
+	factory <- FactoryDao 객체 참조변수
+ -->
+ 
+ <bean id="noticeDto" class="notice.model.dto.NoticeDto"></bean>
+
+ 
+<!-- service bean config -->
+
+<bean id="noticeService" class="notice.model.service.NoticeService">
+	<constructor-arg ref="noticeDao" />
+</bean>
+
+<bean id="loginService" class="notice.model.service.LoginService">
+	<constructor-arg ref="loginDao" />
+</bean>
+
+<!-- controller bean config -->
+ 
+<bean id="controller" class="notice.controller.Controller" >
+	<property name="loginDao" ref="loginDao"></property>
+	<property name="noticeDao" ref="noticeDao"></property>
+	
+</bean>
+
+
+
+
+</beans>
